@@ -8,90 +8,139 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-dark: #050505;
-            --bg-card: linear-gradient(145deg, #111111, #1a1a1a);
-            --bg-card-alt: linear-gradient(145deg, #0d0d0d, #141414);
-            --text-light: #f2efe9;
-            --text-muted: #888888;
-            --border-color: #222222;
-            --border-hover: #444444;
-            --accent: #ffffff;
-            --highlight: #dcd9d2;
+            --bg-dark: #000000;
+            --bg-card: rgba(28, 28, 30, 0.5);
+            --bg-card-alt: rgba(44, 44, 46, 0.4);
+            --text-light: #f5f5f7;
+            --text-muted: #86868b;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.25);
+            --accent: #2997ff; /* Apple System Blue */
+            --glass-blur: blur(20px);
+        }
+
+        /* Tipografía estilo Apple (San Francisco) */
+        @font-face {
+            font-family: 'SF Pro Display';
+            src: local('-apple-system'), local('BlinkMacSystemFont');
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
             scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-light);
-            line-height: 1.6;
+            line-height: 1.47059;
+            letter-spacing: -0.022em;
             overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow */
+        .bg-glow {
+            position: fixed;
+            top: -20vh;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 80vh;
+            background: radial-gradient(circle, rgba(41,151,255,0.08) 0%, transparent 60%);
+            filter: blur(100px);
+            z-index: -1;
+            pointer-events: none;
         }
 
         /* Animations */
-        .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.25, 0.8, 0.25, 1); }
-        .reveal.active { opacity: 1; transform: translateY(0); }
-
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.02); border-color: #333; }
-            50% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.1); border-color: #666; }
-            100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.02); border-color: #333; }
+        .reveal { 
+            opacity: 0; 
+            transform: translateY(40px) scale(0.98); 
+            filter: blur(10px);
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), 
+                        transform 1s cubic-bezier(0.16, 1, 0.3, 1),
+                        filter 1s cubic-bezier(0.16, 1, 0.3, 1); 
+        }
+        .reveal.active { 
+            opacity: 1; 
+            transform: translateY(0) scale(1); 
+            filter: blur(0);
         }
 
-        @keyframes slideInLeft {
-            0% { opacity: 0; transform: translateX(-30px); }
-            100% { opacity: 1; transform: translateX(0); }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.02); border-color: rgba(255,255,255,0.1); }
+            50% { box-shadow: 0 0 30px rgba(41, 151, 255, 0.15); border-color: rgba(41,151,255,0.4); }
+            100% { box-shadow: 0 0 15px rgba(255, 255, 255, 0.02); border-color: rgba(255,255,255,0.1); }
         }
 
         /* Navbar */
         nav {
-            padding: 20px 5%;
-            border-bottom: 1px solid var(--border-color);
+            padding: 16px 5%;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(12px);
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: saturate(180%) var(--glass-blur);
+            -webkit-backdrop-filter: saturate(180%) var(--glass-blur);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .logo { font-size: 24px; font-weight: 900; letter-spacing: 2px; }
-        .logo span { font-weight: 400; color: var(--text-muted); font-size: 14px; letter-spacing: 4px; }
+        .logo { font-size: 20px; font-weight: 700; letter-spacing: 1px; color: #fff; }
+        .logo span { font-weight: 400; color: var(--text-muted); font-size: 13px; letter-spacing: 3px; }
 
         /* Hero */
         .hero {
             text-align: center;
-            padding: 120px 5% 100px;
-            max-width: 900px;
+            padding: 160px 5% 120px;
+            max-width: 980px;
             margin: 0 auto;
         }
-        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; line-height: 1.1; text-transform: uppercase; letter-spacing: -1px;}
-        .hero p { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 40px; }
+        .hero h1 { 
+            font-size: 4.5rem; 
+            font-weight: 700;
+            letter-spacing: -0.04em;
+            line-height: 1.05;
+            margin-bottom: 24px;
+            background: linear-gradient(180deg, #fff 0%, #a1a1a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p { 
+            font-size: 1.4rem; 
+            color: var(--text-muted); 
+            margin-bottom: 48px; 
+            font-weight: 500;
+            letter-spacing: -0.015em;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
         
+        /* Buttons */
         .btn {
             display: inline-block;
             background-color: var(--text-light);
-            color: var(--bg-dark);
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
+            color: #000;
+            padding: 14px 28px;
+            font-size: 17px;
+            font-weight: 600;
             text-decoration: none;
-            text-transform: uppercase;
-            border-radius: 4px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: 980px;
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
         .btn:hover {
-            background-color: #ffffff;
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 10px 20px rgba(255,255,255,0.15);
+            transform: scale(1.03);
+            box-shadow: 0 8px 24px rgba(255,255,255,0.15);
         }
+        .btn:active { transform: scale(0.97); }
         
         .btn-outline {
             background-color: transparent;
@@ -99,194 +148,217 @@
             border: 1px solid var(--border-color);
         }
         .btn-outline:hover {
-            background-color: rgba(255,255,255,0.05);
-            border-color: var(--border-hover);
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--text-light);
         }
 
         /* Layout */
-        .container { max-width: 1100px; margin: 0 auto; padding: 80px 5%; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 100px 5%; }
         .container-sm { max-width: 800px; margin: 0 auto; padding: 60px 5%; }
         .section-title {
-            text-align: center; font-size: 2.2rem; margin-bottom: 20px;
-            text-transform: uppercase; letter-spacing: 1px; color: #fff;
+            text-align: center; 
+            font-size: 3rem; 
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: -0.03em; 
+            color: #fff;
         }
         .section-subtitle {
-            text-align: center; color: var(--text-muted); max-width: 800px; margin: 0 auto 60px; font-size: 1.1rem;
+            text-align: center; 
+            color: var(--text-muted); 
+            max-width: 800px; 
+            margin: 0 auto 60px; 
+            font-size: 1.3rem;
+            font-weight: 500;
+            letter-spacing: -0.015em;
         }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
 
-        /* Cards Generales */
+        /* Cards */
         .card {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            padding: 40px 30px; border-radius: 8px;
-            transition: all 0.4s ease;
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color);
+            padding: 48px 40px; 
+            border-radius: 24px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
             height: 100%;
         }
         .card:hover {
-            transform: translateY(-10px); border-color: var(--border-hover);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            transform: translateY(-8px) scale(1.01); 
+            border-color: var(--border-hover);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
-        .card h3 { font-size: 1.3rem; margin-bottom: 15px; text-transform: uppercase; color: #fff;}
-        .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
-        .card ul { list-style: none; color: var(--text-muted); font-size: 0.95rem; }
-        .card ul li { margin-bottom: 10px; padding-left: 18px; position: relative; }
-        .card ul li::before { content: '✦'; position: absolute; left: 0; color: #666; font-size: 0.8rem; transition: 0.3s;}
-        .card:hover ul li::before { color: var(--text-light); }
+        .card h3 { font-size: 1.4rem; font-weight: 600; margin-bottom: 12px; letter-spacing: -0.02em; color: #fff;}
+        .card p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 0; line-height: 1.5; }
 
-        /* Feature Highlight Box */
+        /* Highlight Box */
         .highlight-box {
-            background: rgba(255, 255, 255, 0.03);
-            border-left: 4px solid var(--text-light);
-            padding: 30px;
+            background: rgba(41, 151, 255, 0.05);
+            border: 1px solid rgba(41, 151, 255, 0.2);
+            padding: 48px;
             margin-bottom: 40px;
-            border-radius: 0 8px 8px 0;
+            border-radius: 24px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            position: relative;
+            overflow: hidden;
         }
-        .highlight-box h4 { font-size: 1.2rem; text-transform: uppercase; margin-bottom: 10px; }
+        .highlight-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+        }
+        .highlight-box h4 { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 16px; color: var(--accent); }
         
         /* Badges */
         .badge {
             display: inline-block;
-            padding: 4px 10px;
-            background: #222;
-            border: 1px solid #444;
-            border-radius: 20px;
-            font-size: 0.75rem;
+            padding: 6px 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 980px;
+            font-size: 0.85rem;
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 15px;
+            letter-spacing: 0.05em;
+            margin-bottom: 24px;
+            color: #d1d1d6;
+            backdrop-filter: blur(10px);
         }
 
-        /* Gráfico Interactivo */
+        /* Gráfico */
         .chart-section {
-            background: var(--bg-card); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 40px; margin-top: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color);
+            border-radius: 24px; 
+            padding: 40px; 
+            margin-top: 30px;
+            backdrop-filter: var(--glass-blur);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
         }
         .chart-controls { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
         .scenario-btn {
-            background: transparent; border: 1px solid var(--border-color);
-            color: var(--text-muted); padding: 10px 25px; border-radius: 30px;
-            cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease;
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted); 
+            padding: 10px 24px; 
+            border-radius: 980px;
+            cursor: pointer; 
+            font-size: 0.95rem; 
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .scenario-btn:hover { border-color: #666; color: #ddd; }
+        .scenario-btn:hover { border-color: rgba(255,255,255,0.3); color: #fff; }
         .scenario-btn.active {
-            background: var(--text-light); color: var(--bg-dark);
-            border-color: var(--text-light); font-weight: bold;
+            background: var(--text-light); 
+            color: #000;
+            border-color: var(--text-light); 
+            font-weight: 600;
             box-shadow: 0 0 15px rgba(255,255,255,0.2);
         }
         .canvas-container { position: relative; height: 400px; width: 100%; }
 
         /* Timeline */
-        .timeline { border-left: 2px solid var(--border-color); padding-left: 40px; margin-top: 60px; }
+        .timeline { border-left: 2px solid rgba(255,255,255,0.1); padding-left: 40px; margin-top: 80px; }
         .timeline-item {
             margin-bottom: 60px; position: relative; background: var(--bg-card-alt);
-            padding: 30px; border-radius: 8px; border: 1px solid var(--border-color); transition: all 0.4s;
+            padding: 40px; border-radius: 24px; border: 1px solid var(--border-color); 
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: var(--glass-blur);
         }
-        .timeline-item:hover { transform: translateX(10px); border-color: var(--border-hover); }
+        .timeline-item:hover { transform: translateX(10px); border-color: rgba(255,255,255,0.3); }
         .timeline-item::before {
-            content: ''; position: absolute; left: -47px; top: 35px;
-            width: 12px; height: 12px; background-color: #444; border-radius: 50%; transition: all 0.3s;
+            content: ''; position: absolute; left: -47px; top: 45px;
+            width: 12px; height: 12px; background-color: #333; border-radius: 50%; 
+            transition: all 0.3s;
+            border: 2px solid #000;
         }
-        .timeline-item:hover::before { background-color: var(--text-light); box-shadow: 0 0 15px rgba(255,255,255,0.6); }
-        .timeline-item h4 { font-size: 1.4rem; margin-bottom: 10px; text-transform: uppercase; color: #fff; }
-        .timeline-item p { color: var(--text-muted); font-size: 1rem; }
+        .timeline-item:hover::before { background-color: var(--accent); box-shadow: 0 0 15px var(--accent); }
+        .timeline-item h4 { font-size: 1.6rem; font-weight: 600; margin-bottom: 12px; color: #fff; letter-spacing: -0.02em;}
+        .timeline-item p { color: var(--text-muted); font-size: 1.1rem; line-height: 1.5;}
 
         /* Pricing */
         .pricing-card {
-            background: var(--bg-card-alt); text-align: center;
-            padding: 50px 30px; border-radius: 8px; border: 1px solid var(--border-color);
-            transition: all 0.4s ease;
+            background: var(--bg-card); text-align: left;
+            padding: 56px 40px; border-radius: 32px; border: 1px solid var(--border-color);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .pricing-card.premium {
-            border: 1px solid #444;
-            background: linear-gradient(180deg, #111, #050505);
-            animation: pulseGlow 4s infinite alternate;
+            background: linear-gradient(180deg, rgba(30,30,32,0.8) 0%, rgba(10,10,12,0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             position: relative;
-            overflow: hidden;
         }
-        /* Escasez Banner */
+        .pricing-card.premium::after {
+            content: ''; position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border-radius: 32px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent 40%, transparent 60%, rgba(255,255,255,0.05));
+            z-index: -1;
+        }
         .scarcity-banner {
-            position: absolute;
-            top: 25px;
-            right: -35px;
-            background: #fff;
-            color: #000;
-            padding: 5px 40px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            transform: rotate(45deg);
-            letter-spacing: 1px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: absolute; top: 25px; right: -35px; background: #fff; color: #000;
+            padding: 6px 40px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+            transform: rotate(45deg); letter-spacing: 1px; box-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
-        .pricing-card.premium:hover {
-            transform: translateY(-10px) scale(1.02);
-            animation: none; border-color: #888;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
-        }
-        .pricing-card h4 { font-size: 1.5rem; text-transform: uppercase; margin-bottom: 15px; color: #ddd;}
-        .pricing-card .price { font-size: 3rem; font-weight: bold; margin-bottom: 10px; color: var(--text-light); }
-        .pricing-card .desc { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
-        .pricing-card ul li { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; font-size: 0.95rem;}
+        .pricing-card:hover { transform: translateY(-12px); border-color: rgba(255,255,255,0.3); }
+        .pricing-card h4 { font-size: 1.5rem; font-weight: 600; margin-bottom: 8px; color: #fff; letter-spacing: -0.02em;}
+        .pricing-card .price { font-size: 3.5rem; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 12px; color: #fff; }
+        .pricing-card .desc { color: var(--text-muted); margin-bottom: 32px; font-size: 1.1rem; font-weight: 500; }
+        .pricing-card ul { margin-bottom: 24px; flex-grow: 1; list-style: none; padding: 0;}
+        .pricing-card ul li { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 16px 0; font-size: 1.05rem; color: #d1d1d6;}
         .pricing-card ul li:last-child { border-bottom: none; }
         
-        /* FAQ Section */
+        /* FAQ */
         .faq-item {
-            background: var(--bg-card-alt);
-            border: 1px solid var(--border-color);
-            margin-bottom: 15px;
-            border-radius: 6px;
-            overflow: hidden;
+            background: var(--bg-card-alt); border: 1px solid var(--border-color);
+            margin-bottom: 16px; border-radius: 16px; overflow: hidden;
+            backdrop-filter: var(--glass-blur);
         }
         .faq-question {
-            padding: 20px 25px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: transparent;
-            border: none;
-            width: 100%;
-            text-align: left;
-            color: var(--text-light);
+            padding: 24px 30px; cursor: pointer; font-weight: 600; font-size: 1.2rem; letter-spacing: -0.015em;
+            display: flex; justify-content: space-between; align-items: center;
+            background: transparent; border: none; width: 100%; text-align: left; color: #fff;
         }
-        .faq-question:hover { background: rgba(255,255,255,0.02); }
+        .faq-question:hover { background: rgba(255,255,255,0.03); }
         .faq-answer {
-            padding: 0 25px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease, padding 0.3s ease;
-            color: var(--text-muted);
-            font-size: 0.95rem;
+            padding: 0 30px; max-height: 0; overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), padding 0.4s ease;
+            color: var(--text-muted); font-size: 1.05rem; line-height: 1.6;
         }
-        .faq-item.active .faq-answer {
-            padding: 0 25px 20px;
-            max-height: 200px;
-        }
-        .faq-icon { transition: transform 0.3s; }
-        .faq-item.active .faq-icon { transform: rotate(45deg); }
+        .faq-item.active .faq-answer { padding: 0 30px 24px; max-height: 300px; }
+        .faq-icon { transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); color: var(--text-muted); font-weight: 300;}
+        .faq-item.active .faq-icon { transform: rotate(45deg); color: #fff;}
 
         footer {
-            text-align: center; padding: 50px 5%; border-top: 1px solid var(--border-color);
-            margin-top: 60px; color: #555; font-size: 0.85rem; letter-spacing: 3px; text-transform: uppercase;
+            text-align: center; padding: 60px 5%; border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 80px; color: #86868b; font-size: 0.85rem; letter-spacing: 0.05em; font-weight: 500;
         }
 
         @media (max-width: 900px) { .grid-4, .grid-3 { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 768px) {
             .grid-2, .grid-4, .grid-3 { grid-template-columns: 1fr; }
-            .hero h1 { font-size: 2.2rem; }
+            .hero h1 { font-size: 3rem; }
             .canvas-container { height: 300px; }
+            .pricing-card { padding: 40px 30px; }
         }
     </style>
 </head>
 <body>
+    <div class="bg-glow"></div>
 
     <nav>
-        <div class="logo">MAID <span>✦ STUDIOS ✦</span></div>
+        <div class="logo">MAID <span>✦ STUDIOS</span></div>
         <a href="#precios" class="btn btn-outline" style="padding: 10px 20px; font-size: 0.85rem;">Ver Planes</a>
     </nav>
 
@@ -294,7 +366,7 @@
         <div class="badge">Servicio de Omnipresencia y Multicuentas</div>
         <h1>Construí una presencia digital imposible de ignorar.</h1>
         <p>Implementamos el sistema de "Cuentas Satélite" y evasión algorítmica diseñado para empresarios que buscan monopolizar su nicho, respaldado por una producción cinematográfica y automatización de ventas.</p>
-        <div style="display:flex; gap:15px; justify-content:center; flex-wrap: wrap;">
+        <div style="display:flex; gap:16px; justify-content:center; flex-wrap: wrap;">
             <a href="#garantia" class="btn">Conocer la Garantía</a>
             <a href="#grafico" class="btn btn-outline">Ver Proyección</a>
         </div>
@@ -306,25 +378,25 @@
         <p class="section-subtitle reveal">No grabamos con un celular en un trípode. Operamos con cámaras mirrorless full-frame (Sony a7C), iluminación controlada y color grading en DaVinci Resolve. Tus cuentas satélite no tendrán contenido basura; emitirán piezas audiovisuales premium que elevan el estatus de tu marca.</p>
         
         <div class="grid-4">
-            <div class="card reveal" style="padding: 30px 20px;">
-                <div style="font-size: 2rem; color: #fff; margin-bottom: 10px;">01</div>
-                <h3 style="font-size: 1.1rem;">Estrategia</h3>
-                <p style="margin-bottom: 0;">Coordinación semanal. Definimos guiones, ángulos y los "hooks" virales a grabar.</p>
+            <div class="card reveal">
+                <div style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 12px; opacity: 0.9;">01</div>
+                <h3>Estrategia</h3>
+                <p>Coordinación semanal. Definimos guiones, ángulos y los "hooks" virales a grabar.</p>
             </div>
-            <div class="card reveal" style="padding: 30px 20px; border-color: #444;">
-                <div style="font-size: 2rem; color: #fff; margin-bottom: 10px;">02</div>
-                <h3 style="font-size: 1.1rem; color: var(--text-light);">Filmmaking</h3>
-                <p style="margin-bottom: 0;">Nuestro equipo va al rodaje y graba todo el volumen mensual en calidad cinematográfica.</p>
+            <div class="card reveal">
+                <div style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 12px; opacity: 0.9;">02</div>
+                <h3>Filmmaking</h3>
+                <p>Nuestro equipo va al rodaje y graba todo el volumen mensual en calidad cinematográfica.</p>
             </div>
-            <div class="card reveal" style="padding: 30px 20px;">
-                <div style="font-size: 2rem; color: #fff; margin-bottom: 10px;">03</div>
-                <h3 style="font-size: 1.1rem;">On-Air (24H)</h3>
-                <p style="margin-bottom: 0;">Post-producción ágil. Al día siguiente del rodaje, el contenido ya está publicado en la red.</p>
+            <div class="card reveal">
+                <div style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 12px; opacity: 0.9;">03</div>
+                <h3>On-Air (24H)</h3>
+                <p>Post-producción ágil. Al día siguiente del rodaje, el contenido ya está publicado en la red.</p>
             </div>
-            <div class="card reveal" style="padding: 30px 20px; border-color: #444;">
-                <div style="font-size: 2rem; color: #fff; margin-bottom: 10px;">04</div>
-                <h3 style="font-size: 1.1rem; color: var(--text-light);">Data & Repeat</h3>
-                <p style="margin-bottom: 0;">Iteramos sobre lo que funciona. Usamos la data para grabar contenido aún más viral la próxima sesión.</p>
+            <div class="card reveal">
+                <div style="font-size: 2.5rem; font-weight: 700; color: #fff; margin-bottom: 12px; opacity: 0.9;">04</div>
+                <h3>Data & Repeat</h3>
+                <p>Iteramos sobre lo que funciona. Usamos la data para grabar contenido aún más viral la próxima sesión.</p>
             </div>
         </div>
     </div>
@@ -339,8 +411,8 @@
                 <h3>1. Red de Distribución Segura</h3>
                 <p>Creamos un ecosistema de cuentas espejo alrededor de tu empresa utilizando tecnología de <strong>Alteración de Hash (Metadatos)</strong>. Volvemos el contenido "invisible" al escáner de duplicidad, evitando el shadowban y multiplicando el alcance.</p>
             </div>
-            <div class="card reveal" style="border-color: #444;">
-                <h3 style="color: var(--text-light);">2. Automatización & Captura (ManyChat)</h3>
+            <div class="card reveal">
+                <h3>2. Automatización & Captura</h3>
                 <p>Las vistas no sirven si no capturamos al lead. Conectamos el tráfico orgánico a flujos conversacionales automatizados 24/7. Perfilamos al prospecto en los comentarios/DMs y lo derivamos listo para comprar a tu WhatsApp o Landing Page.</p>
             </div>
         </div>
@@ -367,8 +439,8 @@
                 <h4>Semanas 1-4: Testeo Masivo</h4>
                 <p>Inundamos las plataformas con volumen. Medimos retención para identificar qué "hooks" capturan la atención del mercado chileno.</p>
             </div>
-            <div class="timeline-item reveal" style="border-color: #555;">
-                <h4 style="color: #fff;">Mes 2: Aislar Ganadores (El salto a Meta Ads)</h4>
+            <div class="timeline-item reveal">
+                <h4>Mes 2: Aislar Ganadores (Meta Ads)</h4>
                 <p>Descartamos lo que no retiene y replicamos las estructuras virales. <strong>Acá está la clave:</strong> Tomamos los videos orgánicos ganadores y los convertimos en anuncios pagos (Retargeting). Escalas con riesgo de inversión cero porque el formato ya está validado.</p>
             </div>
             <div class="timeline-item reveal">
@@ -380,66 +452,66 @@
 
     <!-- 4. EL FILTRO Y LA GARANTÍA -->
     <div class="container-sm" id="garantia">
-        <div class="highlight-box reveal" style="border-left-color: #ff3333; background: rgba(255, 0, 0, 0.03);">
-            <h4 style="color: #ff3333;">Filtro de Cualificación: Para quién NO es esto</h4>
-            <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 0;">No trabajamos con principiantes. No hacemos "contenido de bailes en tendencia". Este sistema de saturación es <strong>exclusivo para empresas, coaches o marcas personales que ya tienen un embudo de ventas validado</strong> y necesitan inyectar tráfico masivo y cualificado para escalar su facturación.</p>
+        <div class="highlight-box reveal" style="border-left-color: #ff3b30; background: rgba(255, 59, 48, 0.05);">
+            <h4 style="color: #ff3b30;">Filtro de Cualificación: Para quién NO es esto</h4>
+            <p style="color: #d1d1d6; font-size: 1.05rem; margin-bottom: 0;">No trabajamos con principiantes. No hacemos "contenido de bailes en tendencia". Este sistema de saturación es <strong>exclusivo para empresas, coaches o marcas personales que ya tienen un embudo de ventas validado</strong> y necesitan inyectar tráfico masivo y cualificado para escalar su facturación.</p>
         </div>
 
-        <div class="highlight-box reveal" style="border-left-color: #fff; background: rgba(255, 255, 255, 0.05); text-align: center; padding: 40px;">
-            <h4 style="font-size: 1.5rem; margin-bottom: 15px;">Nuestra Garantía Blindada de 90 Días</h4>
-            <p style="color: #ddd; font-size: 1.1rem; margin-bottom: 0;">Si tomás el plan de Dominio Total y no alcanzamos el piso mínimo garantizado de visualizaciones orgánicas al finalizar el trimestre, <strong>nuestra agencia trabajará completamente gratis</strong> hasta lograrlo. Todo el riesgo operativo lo asumimos nosotros.</p>
+        <div class="highlight-box reveal" style="border-left-color: #fff; background: rgba(255, 255, 255, 0.05); text-align: center;">
+            <h4 style="color: #fff; margin-bottom: 16px;">Nuestra Garantía Blindada de 90 Días</h4>
+            <p style="color: #d1d1d6; font-size: 1.1rem; margin-bottom: 0;">Si tomás el plan de Dominio Total y no alcanzamos el piso mínimo garantizado de visualizaciones orgánicas al finalizar el trimestre, <strong>nuestra agencia trabajará completamente gratis</strong> hasta lograrlo. Todo el riesgo operativo lo asumimos nosotros.</p>
         </div>
     </div>
 
-    <!-- 5. PRECIOS Y ESCASEZ (Ajustado a 3 niveles) -->
+    <!-- 5. PRECIOS Y ESCASEZ -->
     <div class="container" id="precios">
         <h2 class="section-title reveal">Infraestructura y Costos</h2>
         <div class="grid-3">
             <div class="pricing-card reveal">
                 <h4>Nivel 1: Presencia Base</h4>
-                <div class="price">$2,700 <span style="font-size: 1rem; color: var(--text-muted);">USD/mes</span></div>
+                <div class="price">$2,700 <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">USD/mes</span></div>
                 <div class="desc">90 Videos Mensuales (1 x red x 30 días)</div>
-                <ul style="text-align: left; margin: 30px auto; max-width: 300px; list-style: none;">
-                    <li style="color: var(--text-muted);">✦ 3 Cuentas Satélite Totales</li>
-                    <li style="color: var(--text-muted);">✦ Edición de volumen estándar</li>
-                    <li style="color: var(--text-muted);">✦ Mantenimiento de presencia</li>
+                <ul>
+                    <li>✦ 3 Cuentas Satélite Totales</li>
+                    <li>✦ Edición de volumen estándar</li>
+                    <li>✦ Mantenimiento de presencia</li>
                 </ul>
             </div>
-            <div class="pricing-card reveal" style="border-color: #444;">
-                <h4 style="color: var(--text-light);">Nivel 2: Crecimiento Acelerado</h4>
-                <div class="price" style="color: var(--text-light);">$6,000 <span style="font-size: 1rem; color: var(--text-muted);">USD/mes</span></div>
+            <div class="pricing-card reveal">
+                <h4>Nivel 2: Crecimiento Acelerado</h4>
+                <div class="price">$6,000 <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">USD/mes</span></div>
                 <div class="desc">270 Videos Mensuales (3 x 3 redes x 30 días)</div>
-                <ul style="text-align: left; margin: 30px auto; max-width: 300px; list-style: none;">
-                    <li style="color: #ddd;">✦ Filmmaking y Rodaje Presencial</li>
-                    <li style="color: #ddd;">✦ 3 Cuentas Satélite + Anti-Shadowban</li>
-                    <li style="color: #ddd;">✦ Automatización ManyChat Básico</li>
+                <ul>
+                    <li>✦ Filmmaking y Rodaje Presencial</li>
+                    <li>✦ 3 Cuentas Satélite + Anti-Shadowban</li>
+                    <li>✦ Automatización ManyChat Básico</li>
                 </ul>
             </div>
             <div class="pricing-card premium reveal">
                 <div class="scarcity-banner">SOLO 2 CUPOS</div>
-                <h4 style="color: var(--text-light);">Nivel 3: Dominio Total</h4>
-                <div class="price" style="color: var(--text-light);">$9,500 <span style="font-size: 1rem; color: var(--text-muted);">USD/mes</span></div>
+                <h4>Nivel 3: Dominio Total</h4>
+                <div class="price">$9,500 <span style="font-size: 1.1rem; color: var(--text-muted); font-weight: 500;">USD/mes</span></div>
                 <div class="desc">810 Videos Mensuales (3 x 9 redes x 30 días)</div>
-                <ul style="text-align: left; margin: 30px auto; max-width: 300px; list-style: none;">
-                    <li style="color: #ddd;">✦ Filmmaking y Rodaje Presencial Mensual</li>
-                    <li style="color: #ddd;">✦ 9 Cuentas Satélite Simultáneas + Anti-Shadowban</li>
-                    <li style="color: #ddd;">✦ Automatización ManyChat + Transición a Ads</li>
-                    <li style="color: #fff; font-weight:bold;">✦ Garantía Blindada de Resultados</li>
+                <ul>
+                    <li>✦ Filmmaking y Rodaje Presencial Mensual</li>
+                    <li>✦ 9 Cuentas Satélite Simultáneas + Anti-Shadowban</li>
+                    <li>✦ Automatización ManyChat + Transición a Ads</li>
+                    <li><strong style="color:#fff;">✦ Garantía Blindada de Resultados</strong></li>
                 </ul>
-                <p style="color: #ff5555; font-size: 0.8rem; margin-top: 15px;">*Por la exigencia de los rodajes físicos y la post-producción masiva, logísticamente solo aceptamos 2 clientes nuevos al mes en este nivel.</p>
-                <a href="#contacto" class="btn" style="margin-top: 20px; width: 100%;">Tomar el Mercado</a>
+                <p style="color: #ff6961; font-size: 0.85rem; margin-top: 16px; line-height: 1.4;">*Por la exigencia de los rodajes físicos y la post-producción masiva, logísticamente solo aceptamos 2 clientes nuevos al mes en este nivel.</p>
+                <a href="#contacto" class="btn" style="margin-top: 24px; width: 100%; text-align: center;">Tomar el Mercado</a>
             </div>
         </div>
     </div>
 
     <!-- 6. FAQ -->
     <div class="container-sm">
-        <h2 class="section-title reveal" style="font-size: 1.8rem;">Preguntas Frecuentes</h2>
+        <h2 class="section-title reveal" style="font-size: 2.2rem;">Preguntas Frecuentes</h2>
         
         <div class="faq-item reveal">
             <button class="faq-question" onclick="toggleFaq(this)">
                 ¿Me pueden banear mi cuenta principal de Instagram/TikTok?
-                <span class="faq-icon">+</span>
+                <span class="faq-icon">＋</span>
             </button>
             <div class="faq-answer">
                 <p>No. Esa es exactamente la ventaja de nuestro sistema. Tu cuenta principal se mantiene inmaculada como la "cuenta madre". El volumen agresivo se sube a las "cuentas satélite" (que nosotros creamos y administramos), blindando tu perfil principal de cualquier riesgo algorítmico.</p>
@@ -449,7 +521,7 @@
         <div class="faq-item reveal">
             <button class="faq-question" onclick="toggleFaq(this)">
                 ¿Tengo que grabar contenido todos los días?
-                <span class="faq-icon">+</span>
+                <span class="faq-icon">＋</span>
             </button>
             <div class="faq-answer">
                 <p>En absoluto. Valoramos el tiempo del empresario. Coordinamos una sesión de rodaje intensiva (mensual o quincenal) donde nuestro equipo va con todo el equipamiento. Grabamos todo el material base en bloque, y nosotros nos encargamos de extraer, editar y publicar los cientos de clips a lo largo del mes.</p>
@@ -459,7 +531,7 @@
         <div class="faq-item reveal">
             <button class="faq-question" onclick="toggleFaq(this)">
                 ¿Hay contrato de permanencia?
-                <span class="faq-icon">+</span>
+                <span class="faq-icon">＋</span>
             </button>
             <div class="faq-answer">
                 <p>Trabajamos con ciclos de maduración de 90 días (3 meses). Domar el algoritmo y aislar el contenido ganador toma tiempo. Un contrato de menor duración no nos permitiría garantizar el retorno de tu inversión ni ejecutar la estrategia de saturación adecuadamente.</p>
@@ -468,30 +540,36 @@
     </div>
 
     <footer>
-        MAID STUDIOS | SISTEMA MULTI-CUENTA AVANZADO | 2026
+        MAID STUDIOS &copy; 2026. SISTEMA MULTI-CUENTA AVANZADO.
     </footer>
 
-    <!-- Lógica de Animaciones y Gráfico -->
     <script>
+        // Animaciones suaves estilo Apple
         function reveal() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
                 var windowHeight = window.innerHeight;
                 var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
+                if (elementTop < windowHeight - 80) {
                     reveals[i].classList.add("active");
                 }
             }
         }
         window.addEventListener("scroll", reveal);
-        reveal();
+        reveal(); // Trigger on load
 
         function toggleFaq(element) {
             const item = element.parentElement;
             item.classList.toggle('active');
+            const icon = element.querySelector('.faq-icon');
+            if (item.classList.contains('active')) {
+                icon.style.transform = 'rotate(45deg)';
+            } else {
+                icon.style.transform = 'rotate(0deg)';
+            }
         }
 
+        // Configuración Chart.js Apple Vibe
         const ctx = document.getElementById('growthChart').getContext('2d');
         let gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
@@ -500,6 +578,9 @@
         const dataPesimista = [10000, 40000, 100000, 160000, 240000];
         const dataRegular = [10000, 90000, 350000, 800000, 1500000];
         const dataOptimo = [10000, 200000, 1200000, 4500000, 10000000];
+
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif';
+        Chart.defaults.color = '#86868b';
 
         const chart = new Chart(ctx, {
             type: 'line',
@@ -512,25 +593,36 @@
                     backgroundColor: gradient,
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#0a0a0a',
+                    tension: 0.4, // Curvas suaves
+                    pointBackgroundColor: '#1c1c1e',
                     pointBorderColor: '#ffffff',
                     pointBorderWidth: 2,
-                    pointRadius: 6,
-                    pointHoverRadius: 10,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
                     pointHoverBackgroundColor: '#ffffff'
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 1000, easing: 'easeOutQuart' },
+                animation: { duration: 1200, easing: 'easeOutQuart' },
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#222', titleColor: '#888', bodyColor: '#fff',
-                        bodyFont: { size: 16, weight: 'bold' }, borderColor: '#444',
-                        borderWidth: 1, padding: 15, displayColors: false,
+                        backgroundColor: 'rgba(28, 28, 30, 0.9)', 
+                        titleColor: '#86868b', 
+                        bodyColor: '#fff',
+                        bodyFont: { size: 15, weight: '600' }, 
+                        borderColor: 'rgba(255,255,255,0.1)',
+                        borderWidth: 1, 
+                        padding: 16, 
+                        cornerRadius: 12,
+                        backdropFilter: 'blur(10px)',
+                        displayColors: false,
                         callbacks: {
                             label: function(context) {
                                 let value = context.raw;
@@ -543,9 +635,9 @@
                 },
                 scales: {
                     y: {
-                        grid: { color: '#222', drawBorder: false },
+                        grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false },
                         ticks: {
-                            color: '#666', font: { size: 11 },
+                            color: '#86868b', font: { size: 11 },
                             callback: function(value) {
                                 if(value >= 1000000) return value/1000000 + 'M';
                                 if(value >= 1000) return value/1000 + 'K';
@@ -555,7 +647,7 @@
                     },
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#888', font: { size: 12, weight: 'bold' } }
+                        ticks: { color: '#86868b', font: { size: 12, weight: '500' } }
                     }
                 }
             }
